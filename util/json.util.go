@@ -7,6 +7,8 @@ import (
 	"my-go-app/dto"
 	"my-go-app/model/monad/result"
 	"net/http"
+
+	E "github.com/IBM/fp-go/either"
 )
 
 // GetRequestはジェネリックな関数で、リクエストボディをデコードします
@@ -31,24 +33,22 @@ func GetRequest[T any](r *http.Request) result.Result[T] {
 	return result.OfOk[T](req)
 }
 
-func GetResponse[T any](r *http.Response) result.Result[T] {
+func GetResponse[T any](r *http.Response) E.Either[error, T] {
 	// リクエストボディを読み取る
 	bodyBytes, readRequestBodyError := io.ReadAll(r.Body)
 	if readRequestBodyError != nil {
-		return result.OfErr[T](readRequestBodyError)
+		return E.Left[T](readRequestBodyError)
 	}
 
 	// JSONを指定された型にデコード
 	var req T
 	jsonUnmarshalError := json.Unmarshal(bodyBytes, &req)
 	if jsonUnmarshalError != nil {
-		log.Println("failed to decode from json", jsonUnmarshalError)
-		// T型のゼロ値を返し、エラーを返す
-		return result.OfErr[T](jsonUnmarshalError)
+		return E.Left[T](jsonUnmarshalError)
 	}
 
 	// 成功した場合、デコードされた構造体を返す
-	return result.OfOk[T](req)
+	return E.Right[error](req)
 }
 
 func JsonDecode[T any](req dto.RequestTest) T {
