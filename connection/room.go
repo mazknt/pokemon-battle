@@ -2,7 +2,8 @@ package connection
 
 import (
 	"my-go-app/dto"
-	"my-go-app/model"
+
+	E "github.com/IBM/fp-go/either"
 )
 
 type Room struct {
@@ -11,7 +12,7 @@ type Room struct {
 	RegistResponse chan dto.RegistResponseDto
 	JakenRequest   chan dto.JakenRequestDto
 	JakenResponse  chan dto.JakenResponseDto
-	Battle         chan model.BattleField
+	Battle         chan E.Either[error, dto.GameBord]
 	Clients        []Client
 	Manager        Manager
 	ID             string
@@ -22,7 +23,7 @@ func NewRoom(client Client, id string) *Room {
 		ID:             id,
 		RegistRequest:  make(chan dto.RegistRequestDto),
 		RegistResponse: make(chan dto.RegistResponseDto),
-		Battle:         make(chan model.BattleField, 1),
+		Battle:         make(chan E.Either[error, dto.GameBord], 1),
 		JakenRequest:   make(chan dto.JakenRequestDto),
 		JakenResponse:  make(chan dto.JakenResponseDto),
 	}

@@ -4,6 +4,7 @@ import (
 	"my-go-app/dto"
 	"my-go-app/model"
 
+	E "github.com/IBM/fp-go/either"
 	"github.com/gorilla/websocket"
 )
 
@@ -13,10 +14,10 @@ type Client struct {
 	ID     string
 
 	RegistRequest  chan dto.RegistRequestDto
-	RegistResponse chan dto.RegistResponseDto
+	RegistResponse chan E.Either[error, dto.GameBord]
 
 	JakenRequest  chan dto.JakenRequestDto
-	JakenResponse chan dto.JakenResponseDto
+	JakenResponse chan E.Either[error, dto.GameBord]
 
 	BattleRequestRequest  chan dto.BattleRequestRequest
 	BattleRequestResponse chan dto.BattleRequestResponse
@@ -34,10 +35,10 @@ func NewClient(socket *websocket.Conn, roomID string) *Client {
 		ID:     "",
 
 		RegistRequest:  make(chan dto.RegistRequestDto),
-		RegistResponse: make(chan dto.RegistResponseDto),
+		RegistResponse: make(chan E.Either[error, dto.GameBord]),
 
 		JakenRequest:  make(chan dto.JakenRequestDto),
-		JakenResponse: make(chan dto.JakenResponseDto),
+		JakenResponse: make(chan E.Either[error, dto.GameBord]),
 
 		BattleRequestRequest:   make(chan dto.BattleRequestRequest),
 		BattleRequestResponse:  make(chan dto.BattleRequestResponse),
